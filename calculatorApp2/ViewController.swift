@@ -113,27 +113,98 @@ class ViewController: UIViewController {
             return nil
         }
     }
-//    let regex = try NSRegularExpression(pattern: pattern)
+    //    let regex = try NSRegularExpression(pattern: pattern)
     
     // 연산자 두번연속 오지않게, 마지막에 연산자 오지않게( = 전에 숫자)
+    //    @objc
+    //    func handleButtonAction(_ sender: UIButton) {
+    //        guard let buttonText = sender.currentTitle else { return }
+    //        if buttonText == "AC" {
+    //            resultLabel.text = "0"
+    //
+    //        } else if buttonText == "=" {
+    //            if let text = resultLabel.text,
+    //               let result = calculate(expression: text) {
+    //                resultLabel.text = String(result)
+    //            }
+    //
+    //        } else {
+    //            if resultLabel.text == "0" {
+    //                resultLabel.text = buttonText
+    //            } else {
+    //                resultLabel.text! += buttonText
+    //            }
+    //        }
+    //    }
     @objc
     func handleButtonAction(_ sender: UIButton) {
         guard let buttonText = sender.currentTitle else { return }
-        if buttonText == "AC" {
-            resultLabel.text = "0"
-            
-        } else if buttonText == "=" {
+        switch buttonText {
+        case "AC": resultLabel.text = "0"
+        case "=":
             if let text = resultLabel.text,
                let result = calculate(expression: text) {
                 resultLabel.text = String(result)
             }
+        case "0":
+            guard let currentText = resultLabel.text else { return }
             
-        } else {
-            if resultLabel.text == "0" {
+            // 맨 앞 0이면 추가 x
+            if currentText == "0" {
+                return
+            }
+            
+            // 연산자 뒤 0이면 추가 x
+            let operators: Set<Character> = ["+", "-", "*", "/"]
+            if let last = currentText.last, operators.contains(last) {
+                return
+            }
+            
+            // 나머지는 0 추가
+            resultLabel.text! += "0"
+            
+            //            guard let buttonText = sender.currentTitle else { return }
+            //
+            //            // 맨 앞 0이면 추가 x
+            //            if buttonText == "0" {
+            //                return
+            //            }
+            
+            //            // 연산자 뒤 0이면 추가 x
+            //            let operators: Set<Character> = ["+", "-", "*", "/"]
+            //            if let last = buttonText.last, operators.contains(last) {
+            //                return
+            //            }
+            //            // 나머지는 0 추가
+            //            resultLabel.text! += "0"
+            
+        case "+", "-", "*", "/":
+            // 맨 앞 0이면 못들어옴.
+            guard let currentText = resultLabel.text else { return }
+            if currentText == "0" {
+                return
+            }
+            // 연산자 뒤 못들어옴.
+            let operators: Set<Character> = ["+", "-", "*", "/"]
+            if let last = currentText.last, operators.contains(last) {
+                return
+            }
+            // 입력된 연산자 그대로 추가
+            resultLabel.text! += buttonText
+
+
+            
+        default:
+            // 처음 누르는 경우 기본값(0)을 해당 숫자로 변경, 처음이 아니면 추가.
+            if resultLabel.text! == "0" {
                 resultLabel.text = buttonText
             } else {
                 resultLabel.text! += buttonText
             }
+            
         }
+        
     }
+    
+    
 }
