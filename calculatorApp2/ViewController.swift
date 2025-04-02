@@ -17,6 +17,7 @@ class ViewController: UIViewController {
         ["1", "2", "3", "*"],
         ["AC", "0", "=", "/"]
     ]
+    let operators: Set<Character> = ["+", "-", "*", "/"]
     
     
     override func viewDidLoad() {
@@ -59,29 +60,31 @@ class ViewController: UIViewController {
     }
     // 버튼 생성 메서드
     func makeButtons(titles: [String]) -> [UIButton] {
+        
+        let operators: Set<String> = ["+", "-", "*", "/", "AC", "="] // Set으로 탐색 속도 향상
+        
         return titles.map { title in
             let button = UIButton()
             button.setTitle(title, for: .normal)
             button.titleLabel?.font = .boldSystemFont(ofSize: 30)
             
-            let operators = ["+", "-", "*", "/", "AC", "="]
-            if operators.contains(title) {
-                button.backgroundColor = .orange
-            } else { button.backgroundColor = UIColor(red: 58/255, green: 58/255, blue: 58/255, alpha: 1)
-            }
+            //            if operators.contains(title) {
+            //                button.backgroundColor = .orange
+            //            } else { button.backgroundColor = UIColor(red: 58/255, green: 58/255, blue: 58/255, alpha: 1)
+            //            }
+            //삼항 연산자로 간결하게 표현
+            button.backgroundColor = operators.contains(title) ?
+                .orange : UIColor(red: 58/255, green: 58/255, blue: 58/255, alpha: 1)
             
             button.layer.cornerRadius = 40
             
             button.addTarget(self, action: #selector(handleButtonAction), for: .touchUpInside)
             
-            button.snp.makeConstraints {
-                $0.height.equalTo(80)
-                $0.width.equalTo(80)
-            }
+            button.snp.makeConstraints { $0.size.equalTo(80) }
+            
             return button
         }
     }
-    
     
     // 가로 스택뷰 생성 메서드
     func makeHorizontalStackView(buttonTitles: [String]) -> UIStackView {
@@ -113,40 +116,49 @@ class ViewController: UIViewController {
             return nil
         }
     }
-    //    let regex = try NSRegularExpression(pattern: pattern)
     
-    // 연산자 두번연속 오지않게, 마지막에 연산자 오지않게( = 전에 숫자)
-    //    @objc
-    //    func handleButtonAction(_ sender: UIButton) {
-    //        guard let buttonText = sender.currentTitle else { return }
-    //        if buttonText == "AC" {
-    //            resultLabel.text = "0"
-    //
-    //        } else if buttonText == "=" {
-    //            if let text = resultLabel.text,
-    //               let result = calculate(expression: text) {
-    //                resultLabel.text = String(result)
-    //            }
-    //
-    //        } else {
-    //            if resultLabel.text == "0" {
-    //                resultLabel.text = buttonText
-    //            } else {
-    //                resultLabel.text! += buttonText
-    //            }
-    //        }
-    //    }
+    func showAlert(message: String) {
+        let alert = UIAlertController(title: "알림", message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "확인", style: .default))
+        present(alert, animated: true)
+        
+    }
+    
+    enum CalculateError: Error {
+        case invalidOperator
+    }
+    // resultLabel에 띄워져 있는 마지막 문자가 연산자일 경우 유효성 검사해보는 메서드
+    func validateText(_ text: String) throws {
+        if let lastText = text.last, operators.contains(lastText) {
+            throw CalculateError.invalidOperator
+        }
+    }
     @objc
     func handleButtonAction(_ sender: UIButton) {
         guard let buttonText = sender.currentTitle else { return }
+        
         switch buttonText {
         case "AC": resultLabel.text = "0"
+            
+            // do try catch 사용해보기 ( 레이블의 마지막이 연산자인 경우 알럿띄우기 )
         case "=":
-            if let text = resultLabel.text,
-               let result = calculate(expression: text) {
-                resultLabel.text = String(result)
+            // do 안에서 발생할 수 있는 모든 오류들을 처리해줘야 함.
+            do {
+                guard let text = resultLabel.text else { return }
+                
+                try validateText(text) // 마지막 문자가 연산자인 경우
+                // 에러가 발생하지 않으면 do의 나머지 부분 실행됨.
+                if let result = calculate(expression: text) {
+                    resultLabel.text = String(result)
+                }
+                
+            } catch {
+                showAlert(message: "마지막에 연산자가 올 수 없습니다.") // validateText 메서드 오류 시 catch
             }
+            
+            
         case "0":
+            // 레이블에 띄워져 있는 숫자
             guard let currentText = resultLabel.text else { return }
             
             // 맨 앞 0이면 추가 x
@@ -154,29 +166,15 @@ class ViewController: UIViewController {
                 return
             }
             
-            // 연산자 뒤 0이면 추가 x
-            let operators: Set<Character> = ["+", "-", "*", "/"]
+            // 연산자 뒤  추가 x
             if let last = currentText.last, operators.contains(last) {
+                //                resultLabel.text = String(currentText.dropLast()) + buttonText
                 return
+            } else {
+                
+                // 나머지는 0 추가
+                resultLabel.text! += "0"
             }
-            
-            // 나머지는 0 추가
-            resultLabel.text! += "0"
-            
-            //            guard let buttonText = sender.currentTitle else { return }
-            //
-            //            // 맨 앞 0이면 추가 x
-            //            if buttonText == "0" {
-            //                return
-            //            }
-            
-            //            // 연산자 뒤 0이면 추가 x
-            //            let operators: Set<Character> = ["+", "-", "*", "/"]
-            //            if let last = buttonText.last, operators.contains(last) {
-            //                return
-            //            }
-            //            // 나머지는 0 추가
-            //            resultLabel.text! += "0"
             
         case "+", "-", "*", "/":
             // 맨 앞 0이면 못들어옴.
@@ -184,15 +182,15 @@ class ViewController: UIViewController {
             if currentText == "0" {
                 return
             }
-            // 연산자 뒤 못들어옴.
-            let operators: Set<Character> = ["+", "-", "*", "/"]
+            //            let operators: Set<Character> = ["+", "-", "*", "/"]    // 전역함수로 뺌.
+            
+            // 연산자 뒤면 현재로 바꾸기
             if let last = currentText.last, operators.contains(last) {
-                return
+                resultLabel.text = String(currentText.dropLast()) + buttonText
+            } else {
+                // 입력된 연산자 그대로 추가
+                resultLabel.text! += buttonText
             }
-            // 입력된 연산자 그대로 추가
-            resultLabel.text! += buttonText
-
-
             
         default:
             // 처음 누르는 경우 기본값(0)을 해당 숫자로 변경, 처음이 아니면 추가.
@@ -201,10 +199,9 @@ class ViewController: UIViewController {
             } else {
                 resultLabel.text! += buttonText
             }
-            
         }
-        
     }
     
-    
 }
+
+
