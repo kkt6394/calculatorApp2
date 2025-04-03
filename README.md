@@ -1,7 +1,7 @@
 [![Typing SVG](https://readme-typing-svg.demolab.com?font=Bungee+Tint&size=35&pause=1000&color=F73B98&width=435&lines=Calculator+II)](https://git.io/typing-svg)
 
 # 프로젝트 소개
-## Swift 기반으로 제작된 간단한 사칙연산 계산기 애플리케이션입니다. UIKit과 SnapKit을 사용하여 UI를 구성하였으며, 연산 기능을 포함한 기본적인 계산기 동작을 구현하였습니다.
+Swift 기반으로 제작된 간단한 사칙연산 계산기 애플리케이션입니다. UIKit과 SnapKit을 사용하여 UI를 구성하였으며, 연산 기능을 포함한 기본적인 계산기 동작을 구현하였습니다.
 
 
 # 주요 기능
