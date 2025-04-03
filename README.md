@@ -16,38 +16,38 @@
 # 사용 기술
 
 + Swift
-+UIKit
-+SnapKit
-+NSExpression을 이용한 연산 처리
++ UIKit
++ SnapKit
++ NSExpression을 이용한 연산 처리
 
 
 # 코드 설명
 
 ## 1. UI 구성 (configureUI, makeLabel, makeButtons 등)
 
-+UILabel을 사용하여 결과를 표시하는 화면을 구성
-+UIButton을 활용하여 숫자 및 연산자 버튼을 생성
-+UIStackView를 이용하여 버튼을 정렬
-+SnapKit을 이용하여 오토레이아웃 적용
++ UILabel을 사용하여 결과를 표시하는 화면을 구성
++ UIButton을 활용하여 숫자 및 연산자 버튼을 생성
++ UIStackView를 이용하여 버튼을 정렬
++ SnapKit을 이용하여 오토레이아웃 적용
 
 ## 2. 계산 기능 (calculate 메서드)
 
-+NSExpression을 활용하여 문자열로 입력된 수식을 계산
-+계산 결과가 nil일 경우 예외 발생
++ NSExpression을 활용하여 문자열로 입력된 수식을 계산
++ 계산 결과가 nil일 경우 예외 발생
 
 ## 3. 버튼 액션 처리 (handleButtonAction 메서드)
 
-+switch-case 문을 활용하여 버튼의 역할을 구분
-+AC 버튼 클릭 시 화면을 초기화
-+숫자 버튼 클릭 시 입력값을 업데이트
-+연산자 버튼 클릭 시 연산자가 연속적으로 입력되지 않도록 검사
-+= 버튼 클릭 시 do-try-catch를 활용하여 계산 수행 및 예외 처리
++ switch-case 문을 활용하여 버튼의 역할을 구분
++ AC 버튼 클릭 시 화면을 초기화
++ 숫자 버튼 클릭 시 입력값을 업데이트
++ 연산자 버튼 클릭 시 연산자가 연속적으로 입력되지 않도록 검사
++ = 버튼 클릭 시 do-try-catch를 활용하여 계산 수행 및 예외 처리
 
 ## 4. 예외 처리 (do-try-catch)
 
-+CalculateError 열거형을 정의하여 오류 유형을 구분
-+validateText 메서드를 통해 마지막 입력이 연산자인 경우 예외 처리
-+연산 중 오류 발생 시 UIAlertController를 사용하여 사용자에게 알림 표시
++ CalculateError 열거형을 정의하여 오류 유형을 구분
++ validateText 메서드를 통해 마지막 입력이 연산자인 경우 예외 처리
++ 연산 중 오류 발생 시 UIAlertController를 사용하여 사용자에게 알림 표시
 
 
 # 실행 방법
@@ -59,13 +59,13 @@
 
 # 향후 개선 사항
 
-+소수점 연산 지원
-+연산 내역 저장 기능 추가
-+디자인 개선 및 애니메이션 추가
++ 소수점 연산 지원
++ 연산 내역 저장 기능 추가
++ 디자인 개선 및 애니메이션 추가
 
 
 # 개발자 정보
 
-+이름: 김기태
++ 이름: 김기태
 
-+개발일: 2025-03-27
++ 개발일: 2025-03-27
