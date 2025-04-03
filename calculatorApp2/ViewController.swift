@@ -35,7 +35,7 @@ class ViewController: UIViewController {
         }
     }
     
-    //UI 구성하는 메서드
+    // UI 구성하는 메서드
     func configureUI() {
         view.backgroundColor = .black
         
@@ -58,6 +58,7 @@ class ViewController: UIViewController {
             $0.height.equalTo(100)
         }
     }
+    
     // 버튼 생성 메서드
     func makeButtons(titles: [String]) -> [UIButton] {
         
@@ -108,15 +109,17 @@ class ViewController: UIViewController {
         
     }
     
-    func calculate(expression: String) -> Int? {
+    // 계산 메서드
+    func calculate(expression: String) throws -> Int {
         let expression = NSExpression(format: expression)
         if let result = expression.expressionValue(with: nil, context: nil) as? Int {
             return result
         } else {
-            return nil
+            throw CalculateError.calculationIsNil
         }
     }
     
+    // 알럿 메서드
     func showAlert(message: String) {
         let alert = UIAlertController(title: "알림", message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "확인", style: .default))
@@ -124,15 +127,20 @@ class ViewController: UIViewController {
         
     }
     
+    // 커스텀 에러
     enum CalculateError: Error {
         case invalidOperator
+        case calculationIsNil
     }
+    
     // resultLabel에 띄워져 있는 마지막 문자가 연산자일 경우 유효성 검사해보는 메서드
     func validateText(_ text: String) throws {
         if let lastText = text.last, operators.contains(lastText) {
             throw CalculateError.invalidOperator
         }
     }
+    
+    // 버튼 액션 담당
     @objc
     func handleButtonAction(_ sender: UIButton) {
         guard let buttonText = sender.currentTitle else { return }
@@ -148,12 +156,20 @@ class ViewController: UIViewController {
                 
                 try validateText(text) // 마지막 문자가 연산자인 경우
                 // 에러가 발생하지 않으면 do의 나머지 부분 실행됨.
-                if let result = calculate(expression: text) {
-                    resultLabel.text = String(result)
-                }
+                let result = try calculate(expression: text)
+                resultLabel.text = String(result)
+                
                 
             } catch {
-                showAlert(message: "마지막에 연산자가 올 수 없습니다.") // validateText 메서드 오류 시 catch
+                switch error as? CalculateError {
+                case .invalidOperator:
+                    showAlert(message: "마지막에 연산자가 올 수 없습니다.") // validateText 메서드 오류 시 catch
+                case .calculationIsNil:
+                    showAlert(message: "연산이 틀렸습니다.")
+                default:
+                    showAlert(message: "")
+                    
+                }
             }
             
             
@@ -203,5 +219,3 @@ class ViewController: UIViewController {
     }
     
 }
-
-
